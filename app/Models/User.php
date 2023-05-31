@@ -48,6 +48,74 @@ class User extends Authenticatable
     
     //このユーザーに関係するモデルの件数をロードする
     public function loadRelationshipCounts(){
-        $this->loadCount('microposts');
+        $this->loadCount(['microposts','followings','followers']);
+    }
+    
+    /*
+     * 子のユーザがフォロー中のユーザ
+     */
+    public function followings(){
+        return $this->belongsToMany(User::class,'user_follow','user_id','follow_id')->withTimestamps();
+    }
+     
+    /**
+    *  このユーザをフォロー中のユーザ
+    */
+    public function followers(){
+        return $this->belongsToMany(User::class,'user_follow','follow_id','user_id')->withTimestamps();
+    }
+    
+    /**
+     * $userIdで指定されたユーザをフォローする
+     * 
+     * @param int $userIt
+     * @return bool
+     */ 
+    public function follow($userId){
+        $exist = $this->is_following($userId);
+        $its_me = $this->id == $userId;
+        
+        if($exist || $its_me){
+            return false;
+        }else{
+            $this->followings()->attach($userId);
+            return true;
+        }
+    }
+    
+    /**
+     * $userIdで指定されたユーザをアンフォローする
+     * 
+     * @param int $userId
+     * @return bool
+     */
+    public function unfollow($userId){
+        $exist = $this->is_following($userId);
+        $its_me = $this->id == $userId;
+        
+        if($exist && !$its_me){
+            $this->followings()->detach($userId);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 指定された$userIdのユーザをこのユーザがフォロー中であるか調べる。フォロー中ならtrueを返す
+     * 
+     * @param int $userID
+     * @return bool
+     */
+    public function is_following($userId){
+        return $this->followings()->where('follow_id',$userId)->exists();
+    }
+    
+    public function feed_microposts(){
+        //このユーザがフォロー中のユーザのidを取得して配列にする
+        $userIds=$this->followings()->pluck('users.id')->toArray();
+        //このユーザのidも配列に追加
+        $userIds[]=$this->id;
+        //それらのユーザが所有する投稿に絞り込む
+        return Micropost::whereIn('user_id',$userIds);
     }
 }

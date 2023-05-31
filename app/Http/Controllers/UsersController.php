@@ -15,7 +15,7 @@ class UsersController extends Controller
         //ユーザー一覧ビューでそれを表示
         return view('users.index',[
             'users'=> $users,
-            ]);
+        ]);
     }
     
     public function show($id)
@@ -27,12 +27,46 @@ class UsersController extends Controller
         $user->loadRelationshipCounts();
         
         //ユーザの投稿一覧を作成日時の降順で取得
-        $microposts=$user->microposts()->orderBy('created_at','desc')->pagenate(10);
+        $microposts=$user->microposts()->orderBy('created_at','desc')->paginate(10);
         
         //ユーザー詳細ビューでそれを表示
         return view('users.show',[
             'user' => $user,
             'microposts' => $microposts,
-            ]);
+        ]);
+    }
+    
+    public function followings($id){
+        //idでユーザを検索
+        $user->User::findOrFail($id);
+        
+        //モデルの件数をロード
+        $user->loadRelationshipCounts();
+        
+        //フォロー一覧を取得
+        $followings=$user->followings()->pagenate(10);
+        
+        //フォロー一覧ビューでそれらを表示
+        return view('users.followings',[
+            'user' => $user,
+            'users' =>$followings,
+        ]);
+    }
+    
+    public function followers($id){
+        //idで検索し取得
+        $user->User::findOrFail($id);
+        
+        //モデルをロード
+        $user->loadRelationshipCounts();
+        
+        //ユーザのフォロワー一覧を取得
+        $followers=$user->followers()->paginate(10);
+        
+        //一覧ビューで表示
+        return view('users.followers',[
+            'user' => $user,
+            'users' => $followers,
+        ]);
     }
 }
