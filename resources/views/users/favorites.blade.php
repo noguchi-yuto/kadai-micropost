@@ -9,10 +9,10 @@
         <div class="sm:col-span-2 mt-4">
             {{--タブ--}}
             @include('users.navtabs')
-            <div class="mt-4">
-                {{--ユーザ一覧--}}
-                @include('users.users')
-            </div>
+            <duv class="mt-4">
+                {{--お気に入り一覧--}}
+                @include('microposts.microposts')
+            </duv>
         </div>
     </div>
 @endsection

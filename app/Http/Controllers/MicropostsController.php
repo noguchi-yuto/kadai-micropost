@@ -20,6 +20,19 @@ class MicropostsController extends Controller
         
         return view('dashboard',$data);
     }
+    public function favoriteIndex(){
+        $data = [];
+        if(\Auth::check()){
+            $user = \Auth::user();
+            $microposts=$user->feed_favorites()->orderBy('created_at','desc')->paginate(10);
+            $data=[
+                'user' => $user,
+                'microposts' => $microposts,
+            ];
+        }
+        
+        return view('dashboard',$data);
+    }
     public function store(Request $request){
         //バリデーション
         $request->validate([

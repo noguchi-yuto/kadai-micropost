@@ -38,13 +38,13 @@ class UsersController extends Controller
     
     public function followings($id){
         //idでユーザを検索
-        $user->User::findOrFail($id);
+        $user = User::findOrFail($id);
         
         //モデルの件数をロード
         $user->loadRelationshipCounts();
         
         //フォロー一覧を取得
-        $followings=$user->followings()->pagenate(10);
+        $followings=$user->followings()->paginate(10);
         
         //フォロー一覧ビューでそれらを表示
         return view('users.followings',[
@@ -55,7 +55,7 @@ class UsersController extends Controller
     
     public function followers($id){
         //idで検索し取得
-        $user->User::findOrFail($id);
+        $user = User::findOrFail($id);
         
         //モデルをロード
         $user->loadRelationshipCounts();
@@ -67,6 +67,20 @@ class UsersController extends Controller
         return view('users.followers',[
             'user' => $user,
             'users' => $followers,
+        ]);
+    }
+    
+    public function favoritings($id){
+        //id検索
+        $user=User::findOrFail($id);
+        //ロード
+        $user->loadRelationshipCounts();
+        //一覧取得
+        $favoritings=$user->favorites()->paginate(10);
+        //ビューで表示
+        return view('users.favorites',[
+            'user'=>$user,
+            'microposts'=>$favoritings,
         ]);
     }
 }

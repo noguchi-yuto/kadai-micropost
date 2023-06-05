@@ -27,6 +27,11 @@
                             @method('DELETE')
                             <button type="submit" class="btn btn-error btn sm normal-case" onclick="return confirm('Delete id = {{$micropost->id}}?')">Delete</button>
                         </form>
+                        {{--お気に入り登録ボタン--}}
+                        @include('user_favorite.favorite_button')
+                    @else
+                        {{--お気に入り登録ボタン--}}
+                        @include('user_favorite.favorite_button')
                     @endif
                 </div>
             </div>
